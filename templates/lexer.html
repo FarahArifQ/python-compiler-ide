@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block title %}Lexical Analysis{% endblock %}
+{% block nav_lex %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+.phase-page{display:flex;flex-direction:column;height:100%;overflow:hidden}
+
+.phase-banner{
+  padding:18px 28px 16px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(99,102,241,0.08) 0%,rgba(99,102,241,0.04) 100%);
+  border-bottom:1px solid rgba(99,102,241,0.12);
+  display:flex;align-items:center;gap:16px;
+}
+.ph-icon{
+  width:48px;height:48px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,#6366f1,#818cf8);
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-size:20px;
+  box-shadow:0 4px 14px rgba(99,102,241,0.38);
+}
+.ph-title{font-size:19px;font-weight:700;color:#1e1b4b;letter-spacing:-0.3px}
+.ph-sub  {font-size:12px;color:#6366f1;font-weight:500;margin-top:2px}
+.ph-spacer{flex:1}
+.ph-badge{
+  padding:5px 13px;border-radius:20px;font-size:11.5px;font-weight:700;
+  background:rgba(99,102,241,0.1);color:#4f46e5;
+  border:1px solid rgba(99,102,241,0.2);
+}
+
+.split{
+  flex:1;overflow:hidden;display:flex;gap:0;
+}
+.split-editor{
+  width:340px;flex-shrink:0;
+  border-right:1px solid #e2e8f0;
+  display:flex;flex-direction:column;
+  background:white;overflow:hidden;
+}
+.split-results{
+  flex:1;overflow-y:auto;padding:20px 24px;
+  background:var(--bg);
+}
+
+.editor-section-label{
+  padding:12px 16px 8px;
+  font-size:10px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:#94a3b8;
+  border-bottom:1px solid #f1f5f9;
+  background:var(--gray-50);
+}
+.editor-inner{
+  flex:1;display:flex;flex-direction:column;
+  background:#fbfcff;overflow:hidden;
+}
+.run-bar{
+  padding:12px 14px;border-top:1px solid #e2e8f0;
+  background:white;display:flex;align-items:center;gap:8px;
+  flex-shrink:0;
+}
+
+/* stats row */
+.stats-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.stat-pill{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:6px 12px;border-radius:20px;
+  background:white;border:1px solid #e2e8f0;
+  box-shadow:0 1px 4px rgba(15,23,42,0.06);
+  font-size:12.5px;font-weight:600;color:#475569;
+}
+.stat-pill i{font-size:12px}
+.sp-lex{border-color:rgba(99,102,241,0.2);background:rgba(99,102,241,0.04)}
+.sp-lex i{color:#6366f1}
+
+.results-title{
+  font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:#94a3b8;margin-bottom:12px;margin-top:4px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="phase-page">
+  <div class="phase-banner">
+    <div class="ph-icon"><i class="fa fa-tags"></i></div>
+    <div>
+      <div class="ph-title">Lexical Analysis</div>
+      <div class="ph-sub">Tokenize source code into a stream of classified tokens</div>
+    </div>
+    <div class="ph-spacer"></div>
+    <div class="ph-badge">Phase 1</div>
+  </div>
+
+  <div class="split">
+    <!-- Editor side -->
+    <div class="split-editor">
+      <div class="editor-section-label"><i class="fa fa-file-code" style="color:#6366f1;margin-right:6px"></i>Source Code</div>
+      <div class="editor-inner">
+        <div class="editor-bar" style="padding:8px 12px;background:white;border-bottom:1px solid #f1f5f9">
+          <div class="mac-dot mac-r"></div>
+          <div class="mac-dot mac-y"></div>
+          <div class="mac-dot mac-g"></div>
+          <div class="editor-name" style="font-size:11.5px">source.py</div>
+          <div class="editor-pos" id="editor-pos" style="font-size:10.5px">Ln 1, Col 1</div>
+        </div>
+        <div class="editor-body" style="flex:1;overflow:hidden">
+          <div class="line-nums" id="line-numbers" style="font-size:12.5px"></div>
+          <textarea class="code-ta" id="code-editor" spellcheck="false"
+            style="font-size:12.5px;height:100%"
+            placeholder="# Write Python code..."></textarea>
+        </div>
+      </div>
+      <div class="run-bar">
+        <button class="btn-run btn-lex" onclick="runLexer()" style="flex:1;justify-content:center">
+          <i class="fa fa-play"></i> Run Lexer
+        </button>
+      </div>
+    </div>
+
+    <!-- Results side -->
+    <div class="split-results" id="results-area">
+      <div class="empty">
+        <div class="empty-icon" style="background:rgba(99,102,241,0.08);color:#6366f1">
+          <i class="fa fa-tags"></i>
+        </div>
+        <h3>Ready to Tokenize</h3>
+        <p>Write or load source code on the left, then click <strong>Run Lexer</strong> to see the token stream.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_script %}
+<script>
+async function runLexer() {
+  const code = (getEd()||{}).value;
+  if (!code||!code.trim()) { showToast('Write some source code first.','err'); return; }
+  setStatus('Tokenizing…');
+  const area = document.getElementById('results-area');
+  area.innerHTML = '<div class="loading"><div class="spin"></div>Tokenizing…</div>';
+  try {
+    const data = await callAPI('lexer', code);
+    const tokens = data.tokens||[], errors = data.errors||[];
+    let h = '';
+
+    /* stats */
+    h += `<div class="stats-row">
+      <div class="stat-pill sp-lex"><i class="fa fa-tags"></i> ${tokens.length} Tokens</div>
+      ${errors.length ? `<div class="stat-pill" style="border-color:rgba(239,68,68,0.2);background:rgba(239,68,68,0.04)"><i class="fa fa-circle-xmark" style="color:#ef4444"></i> ${errors.length} Error(s)</div>` : '<div class="stat-pill" style="border-color:rgba(16,185,129,0.2);background:rgba(16,185,129,0.04)"><i class="fa fa-circle-check" style="color:#10b981"></i> No Errors</div>'}
+    </div>`;
+
+    /* error cards */
+    errors.forEach(e=>{
+      h+=`<div class="s-card s-err" style="margin-bottom:10px">
+        <i class="fa fa-triangle-exclamation sc-icon"></i>
+        <div><div class="sc-title">Lexical Error</div>
+        <div class="sc-msg">${escH(e.message)}</div>
+        <div class="sc-line">Line ${e.line}</div></div></div>`;
+    });
+
+    if (!tokens.length) {
+      h += '<div class="empty"><div class="empty-icon"><i class="fa fa-exclamation-circle"></i></div><h3>No tokens found</h3></div>';
+    } else {
+      h += '<div class="results-title"><i class="fa fa-tags" style="color:#6366f1;margin-right:6px"></i>Token Stream</div>';
+      h += '<div style="background:white;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,0.06)">';
+      h += '<table class="r-table"><thead><tr><th>#</th><th>Token Value</th><th>Token Type</th><th>Line</th></tr></thead><tbody>';
+      tokens.forEach((t,i)=>{
+        h+=`<tr><td style="color:var(--gray-400);font-family:'JetBrains Mono',monospace;font-size:12px">${i+1}</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-weight:500;color:#334155">${escH(t.value)}</td>
+          <td><span class="badge badge-${t.token_type}">${t.token_type}</span></td>
+          <td style="color:var(--gray-400);font-family:'JetBrains Mono',monospace;font-size:12px">${t.line}</td></tr>`;
+      });
+      h += '</tbody></table></div>';
+    }
+    area.innerHTML = h;
+    setStatus(errors.length ? errors.length+' error(s)' : 'Tokenized', errors.length?'err':'ok');
+    showToast('Lexical analysis complete.', errors.length?'err':'ok');
+  } catch(err) {
+    area.innerHTML = `<div class="s-card s-err"><i class="fa fa-circle-xmark sc-icon"></i><div><div class="sc-title">Server Error</div><div class="sc-msg">${escH(err.message)}</div></div></div>`;
+    setStatus('Error','err');
+  }
+}
+</script>
+{% endblock %}

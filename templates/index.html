@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ---- home page layout ---- */
+.home-wrap{
+  display:flex; flex-direction:column;
+  height:100%; overflow:hidden;
+}
+
+/* hero banner */
+.home-hero{
+  background:linear-gradient(135deg,rgba(99,102,241,0.07) 0%,rgba(139,92,246,0.05) 100%);
+  border-bottom:1px solid rgba(99,102,241,0.1);
+  padding:18px 28px 14px;
+  display:flex; align-items:center; gap:16px; flex-shrink:0;
+}
+.hero-icon{
+  width:46px;height:46px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-size:20px;
+  box-shadow:0 4px 14px rgba(99,102,241,0.35);
+}
+.hero-title{font-size:18px;font-weight:700;color:#1e1b4b;letter-spacing:-0.3px}
+.hero-sub  {font-size:12px;color:#6366f1;font-weight:500;margin-top:2px}
+.hero-spacer{flex:1}
+.hero-run{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 20px;border-radius:10px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:white;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;
+  box-shadow:0 4px 14px rgba(99,102,241,0.38);transition:0.2s cubic-bezier(0.4,0,0.2,1);
+}
+.hero-run:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(99,102,241,0.46)}
+.hero-run:active{transform:scale(0.97)}
+.kbd-badge{
+  display:inline-flex;align-items:center;
+  padding:2px 8px;border-radius:5px;margin-left:4px;
+  background:rgba(255,255,255,0.2);font-size:11px;
+  font-family:'JetBrains Mono',monospace;
+}
+
+/* editor section */
+.ed-section{
+  flex-shrink:0; padding:16px 24px 0;
+  display:flex; flex-direction:column; gap:10px;
+}
+
+/* results section */
+.results-section{
+  flex:1; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+
+/* phase navigation tabs */
+.phase-tabs{
+  display:flex; gap:0; padding:0 24px;
+  background:transparent; flex-shrink:0; margin-top:12px;
+}
+.phase-tab{
+  display:flex;align-items:center;gap:7px;
+  padding:9px 18px;
+  font-size:12.5px;font-weight:600;cursor:pointer;
+  border-bottom:2.5px solid transparent;
+  color:#94a3b8;transition:0.18s ease;
+  background:none;border-top:none;border-left:none;border-right:none;
+  font-family:'Inter',sans-serif;
+}
+.phase-tab:hover{color:#475569}
+.phase-tab.active{border-bottom-color:currentColor}
+.phase-tab.t-lex{color:#6366f1}
+.phase-tab.t-par{color:#8b5cf6}
+.phase-tab.t-sem{color:#f59e0b}
+.phase-tab.t-sym{color:#10b981}
+.phase-tab.t-log{color:#64748b}
+.phase-tab.t-lex.active,.phase-tab.t-par.active,.phase-tab.t-sem.active,
+.phase-tab.t-sym.active,.phase-tab.t-log.active{opacity:1}
+.phase-tab:not(.active){opacity:0.55}
+.phase-tab:not(.active):hover{opacity:0.85}
+
+.tab-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.tab-cnt{
+  font-size:10px;padding:1px 6px;border-radius:9px;
+  background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;
+  font-family:'JetBrains Mono',monospace;
+}
+
+.tab-panels{flex:1;overflow:hidden;position:relative}
+.tab-panel{display:none;height:100%;overflow-y:auto;padding:16px 24px 20px}
+.tab-panel.active{display:block}
+
+/* phase cards on initial load */
+.phase-cards{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:12px;padding:18px 24px;
+}
+.phase-card{
+  background:white;border-radius:14px;border:1px solid #e2e8f0;
+  padding:18px 16px;cursor:pointer;transition:0.2s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 2px 8px rgba(15,23,42,0.06);
+  text-decoration:none;display:block;
+}
+.phase-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(15,23,42,0.10)}
+.pc-icon{
+  width:40px;height:40px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;margin-bottom:10px;
+}
+.pc-lex  .pc-icon{background:rgba(99,102,241,0.1);color:#6366f1}
+.pc-par  .pc-icon{background:rgba(139,92,246,0.1);color:#8b5cf6}
+.pc-sem  .pc-icon{background:rgba(245,158,11,0.1);color:#f59e0b}
+.pc-sym  .pc-icon{background:rgba(16,185,129,0.1);color:#10b981}
+.pc-name {font-size:13px;font-weight:700;color:#1e293b;margin-bottom:4px}
+.pc-desc {font-size:11.5px;color:#94a3b8;line-height:1.55}
+.pc-badge{
+  display:inline-block;margin-top:10px;
+  font-size:10px;font-weight:700;letter-spacing:0.4px;
+  padding:3px 8px;border-radius:20px;
+}
+.pc-lex  .pc-badge{background:rgba(99,102,241,0.09);color:#4f46e5}
+.pc-par  .pc-badge{background:rgba(139,92,246,0.09);color:#7c3aed}
+.pc-sem  .pc-badge{background:rgba(245,158,11,0.09);color:#d97706}
+.pc-sym  .pc-badge{background:rgba(16,185,129,0.09);color:#059669}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="home-wrap">
+
+  <!-- HERO BANNER -->
+  <div class="home-hero">
+    <div class="hero-icon"><i class="fa fa-microchip"></i></div>
+    <div>
+      <div class="hero-title">Python Compiler IDE</div>
+      <div class="hero-sub">Write Python source code and analyze it through all compiler phases</div>
+    </div>
+    <div class="hero-spacer"></div>
+    <button class="hero-run" onclick="runAll()">
+      <i class="fa fa-bolt"></i>
+      Run All Phases
+      <span class="kbd-badge">F5</span>
+    </button>
+  </div>
+
+  <!-- EDITOR -->
+  <div class="ed-section">
+    <div class="editor-card">
+      <div class="editor-bar">
+        <div class="mac-dot mac-r"></div>
+        <div class="mac-dot mac-y"></div>
+        <div class="mac-dot mac-g"></div>
+        <div class="editor-name">source.c</div>
+        <div class="editor-pos" id="editor-pos">Ln 1, Col 1</div>
+      </div>
+      <div class="editor-body" style="min-height:190px;max-height:190px">
+        <div class="line-nums" id="line-numbers">1</div>
+        <textarea class="code-ta" id="code-editor" spellcheck="false"
+          style="height:190px"
+          placeholder="# Write Python code here...
+x = 10
+y = 3.14
+if x > 5:
+    print(x)"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS + PHASE CARDS -->
+  <div class="results-section">
+    <div id="init-cards">
+      <!-- Phase overview cards -->
+      <div class="phase-cards">
+        <a href="/lexer-page" class="phase-card pc-lex">
+          <div class="pc-icon"><i class="fa fa-tags"></i></div>
+          <div class="pc-name">Lexical Analysis</div>
+          <div class="pc-desc">Tokenize source into keywords, identifiers, literals and operators</div>
+          <div class="pc-badge">Phase 1</div>
+        </a>
+        <a href="/parser-page" class="phase-card pc-par">
+          <div class="pc-icon"><i class="fa fa-sitemap"></i></div>
+          <div class="pc-name">Syntax Analysis</div>
+          <div class="pc-desc">Verify grammar rules with recursive descent parsing</div>
+          <div class="pc-badge">Phase 2</div>
+        </a>
+        <a href="/semantic-page" class="phase-card pc-sem">
+          <div class="pc-icon"><i class="fa fa-brain"></i></div>
+          <div class="pc-name">Semantic Analysis</div>
+          <div class="pc-desc">Check type compatibility, scope rules and declarations</div>
+          <div class="pc-badge">Phase 3</div>
+        </a>
+        <a href="/symbol-page" class="phase-card pc-sym">
+          <div class="pc-icon"><i class="fa fa-table"></i></div>
+          <div class="pc-name">Symbol Table</div>
+          <div class="pc-desc">Build a table of all identifiers with types, scope and addresses</div>
+          <div class="pc-badge">Phase 4</div>
+        </a>
+      </div>
+    </div>
+
+    <div id="results-view" style="display:none;flex:1;overflow:hidden;flex-direction:column">
+      <div class="phase-tabs">
+        <button class="phase-tab t-lex active" id="tab-tokens" onclick="switchTab('tokens')">
+          <span class="tab-dot" style="background:#6366f1"></span>
+          Tokens
+          <span class="tab-cnt" id="cnt-tokens">0</span>
+        </button>
+        <button class="phase-tab t-par" id="tab-parse" onclick="switchTab('parse')">
+          <span class="tab-dot" style="background:#8b5cf6"></span>
+          Syntax
+          <span class="tab-cnt" id="cnt-parse">—</span>
+        </button>
+        <button class="phase-tab t-sem" id="tab-semantic" onclick="switchTab('semantic')">
+          <span class="tab-dot" style="background:#f59e0b"></span>
+          Semantic
+          <span class="tab-cnt" id="cnt-semantic">—</span>
+        </button>
+        <button class="phase-tab t-sym" id="tab-symbol" onclick="switchTab('symbol')">
+          <span class="tab-dot" style="background:#10b981"></span>
+          Symbols
+          <span class="tab-cnt" id="cnt-symbol">0</span>
+        </button>
+        <button class="phase-tab t-log" id="tab-log" onclick="switchTab('log')">
+          <span class="tab-dot" style="background:#94a3b8"></span>
+          Console
+        </button>
+      </div>
+
+      <div class="tab-panels">
+        <div class="tab-panel active" id="content-tokens"></div>
+        <div class="tab-panel" id="content-parse"></div>
+        <div class="tab-panel" id="content-semantic"></div>
+        <div class="tab-panel" id="content-symbol"></div>
+        <div class="tab-panel" id="content-log"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_script %}
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.phase-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.getElementById('content-'+name).classList.add('active');
+}
+
+function showResults() {
+  document.getElementById('init-cards').style.display = 'none';
+  const rv = document.getElementById('results-view');
+  rv.style.display = 'flex';
+}
+
+function setLoading(id) {
+  document.getElementById(id).innerHTML =
+    '<div class="loading"><div class="spin"></div>Analyzing…</div>';
+}
+
+function renderTokens(data) {
+  const tokens = data.tokens||[], errors = data.errors||[];
+  document.getElementById('cnt-tokens').textContent = tokens.length;
+  let h = '';
+  errors.forEach(e=>{h+=`<div class="s-card s-err"><i class="fa fa-triangle-exclamation sc-icon"></i><div><div class="sc-title">Lexical Error</div><div class="sc-msg">${escH(e.message)}</div><div class="sc-line">Line ${e.line}</div></div></div>`;});
+  if (!tokens.length) {
+    h += '<div class="empty"><div class="empty-icon"><i class="fa fa-tags"></i></div><h3>No tokens found</h3><p>Check your source code for valid syntax.</p></div>';
+  } else {
+    h += '<table class="r-table"><thead><tr><th>#</th><th>Value</th><th>Type</th><th>Line</th></tr></thead><tbody>';
+    tokens.forEach((t,i)=>{
+      h += `<tr><td style="color:var(--gray-400);font-family:'JetBrains Mono',monospace;font-size:12px">${i+1}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-weight:500">${escH(t.value)}</td>
+        <td><span class="badge badge-${t.token_type}">${t.token_type}</span></td>
+        <td style="color:var(--gray-400);font-family:'JetBrains Mono',monospace;font-size:12px">${t.line}</td></tr>`;
+    });
+    h += '</tbody></table>';
+  }
+  document.getElementById('content-tokens').innerHTML = h;
+}
+
+function renderParser(data) {
+  const ok=data.success, errors=data.errors||[], steps=data.parse_steps||[];
+  document.getElementById('cnt-parse').textContent = ok ? '✓' : errors.length+'err';
+  let h = `<div class="s-card ${ok?'s-ok':'s-err'}">
+    <i class="fa fa-${ok?'circle-check':'circle-xmark'} sc-icon"></i>
+    <div><div class="sc-title">Syntax: ${ok?'PASSED':'FAILED'}</div>
+    <div class="sc-msg">${ok?'All grammar rules satisfied.':errors.length+' syntax error(s).'}</div></div></div>`;
+  errors.forEach(e=>{h+=`<div class="s-card s-err"><i class="fa fa-bug sc-icon"></i><div><div class="sc-title">Syntax Error</div><div class="sc-msg">${escH(e.message)}</div><div class="sc-line">Line ${e.line}</div></div></div>`;});
+  if (steps.length) {
+    h += '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray-400);margin:14px 0 8px">Parsing Steps</div>';
+    h += '<div class="parse-steps">';
+    steps.forEach((s,i)=>{h+=`<div class="parse-step"><span class="step-n">${String(i+1).padStart(2,'0')}.</span><span>${escH(s)}</span></div>`;});
+    h += '</div>';
+  }
+  document.getElementById('content-parse').innerHTML = h;
+}
+
+function renderSemantic(data) {
+  const ok=data.success, errors=data.errors||[], warns=data.warnings||[];
+  document.getElementById('cnt-semantic').textContent = ok ? '✓' : errors.length+'err';
+  let h = `<div class="s-card ${ok?'s-ok':'s-err'}">
+    <i class="fa fa-${ok?'circle-check':'circle-xmark'} sc-icon"></i>
+    <div><div class="sc-title">Semantic: ${ok?'PASSED':'FAILED'}</div>
+    <div class="sc-msg">${ok?'No semantic errors.':errors.length+' error(s), '+warns.length+' warning(s).'}</div></div></div>`;
+  errors.forEach(e=>{h+=`<div class="s-card s-err"><i class="fa fa-circle-xmark sc-icon"></i><div><div class="sc-title">Semantic Error</div><div class="sc-msg">${escH(e.message)}</div><div class="sc-line">Line ${e.line}</div></div></div>`;});
+  warns.forEach(w=>{h+=`<div class="s-card s-warn"><i class="fa fa-triangle-exclamation sc-icon"></i><div><div class="sc-title">Warning</div><div class="sc-msg">${escH(w.message)}</div><div class="sc-line">Line ${w.line}</div></div></div>`;});
+  document.getElementById('content-semantic').innerHTML = h;
+}
+
+function renderSymbolTable(data) {
+  const entries=data.entries||[];
+  document.getElementById('cnt-symbol').textContent = entries.length;
+  let h = '';
+  if (!entries.length) {
+    h = '<div class="empty"><div class="empty-icon"><i class="fa fa-table"></i></div><h3>No symbols found</h3><p>Declare variables or functions to populate the symbol table.</p></div>';
+  } else {
+    h = '<table class="r-table"><thead><tr><th>#</th><th>Name</th><th>Kind</th><th>Type</th><th>Scope</th><th>Value</th><th>Address</th></tr></thead><tbody>';
+    entries.forEach((e,i)=>{
+      const kindColor = {function:'#6366f1',class:'#8b5cf6',parameter:'#f59e0b',module:'#06b6d4'}[e.kind]||'#64748b';
+      h+=`<tr><td style="color:var(--gray-400);font-size:12px;font-family:'JetBrains Mono',monospace">${i+1}</td>
+        <td class="sym-name">${escH(e.name)}</td>
+        <td><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:${kindColor}18;color:${kindColor}">${e.kind}</span></td>
+        <td class="sym-type">${e.data_type}</td>
+        <td class="${e.scope==='global'?'sym-global':'sym-local'}">${e.scope}</td>
+        <td class="sym-val">${escH(String(e.value))}</td>
+        <td class="sym-addr">${e.address}</td></tr>`;
+    });
+    h += '</tbody></table>';
+  }
+  document.getElementById('content-symbol').innerHTML = h;
+}
+
+function renderLog(logs) {
+  if (!logs||!logs.length) {
+    document.getElementById('content-log').innerHTML =
+      '<div class="empty"><div class="empty-icon"><i class="fa fa-terminal"></i></div><h3>No logs yet</h3></div>';
+    return;
+  }
+  const colorMap = {LEXER:'#6366f1',PARSER:'#8b5cf6',SEMANTIC:'#f59e0b',SYMTABLE:'#10b981',ERROR:'#ef4444'};
+  const lines = logs.map(l=>{
+    let c = '#64748b';
+    Object.entries(colorMap).forEach(([k,v])=>{ if(l.includes(k)) c=v; });
+    return `<div style="font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;color:${c};padding:1px 0">${escH(l)}</div>`;
+  }).join('');
+  document.getElementById('content-log').innerHTML =
+    `<div style="background:white;border-radius:10px;border:1px solid #e2e8f0;padding:14px;box-shadow:0 2px 8px rgba(15,23,42,0.06)">${lines}</div>`;
+}
+
+async function runAll() {
+  const code = (getEd()||{}).value;
+  if (!code||!code.trim()) { showToast('Write some source code first.','err'); return; }
+  setStatus('Running…');
+  showResults();
+  ['content-tokens','content-parse','content-semantic','content-symbol'].forEach(setLoading);
+  switchTab('tokens');
+  try {
+    const data = await callAPI('analyze_all', code);
+    renderTokens(data.lexer);
+    renderParser(data.parser);
+    renderSemantic(data.semantic);
+    renderSymbolTable(data.symbol_table);
+    const logs = [...(data.lexer.log||[]),...(data.parser.log||[]),...(data.semantic.log||[]),...(data.symbol_table.log||[])];
+    renderLog(logs);
+    const errs = (data.lexer.errors?.length||0)+(data.parser.errors?.length||0)+(data.semantic.errors?.length||0);
+    setStatus(errs ? errs+' error(s)':'All phases passed', errs?'err':'ok');
+    showToast(errs?`Completed with ${errs} error(s).`:'All phases passed!', errs?'err':'ok');
+  } catch(err) {
+    showToast('Server error: '+err.message,'err'); setStatus('Error','err');
+  }
+}
+</script>
+{% endblock %}
