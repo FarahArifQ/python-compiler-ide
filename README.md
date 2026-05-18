@@ -8,7 +8,7 @@ A browser-based Python compiler that demonstrates all four classical compiler ph
 
 ## Live Demo
 
-> [View on Vercel](https://your-project.vercel.app) — _update link after deployment_
+> [View on Vercel](https://python-compiler-ide.vercel.app/) —
 
 ---
 
@@ -16,12 +16,12 @@ A browser-based Python compiler that demonstrates all four classical compiler ph
 
 Write any Python code in the browser editor and run it through four compiler phases:
 
-| Phase | Page | What you see |
-|-------|------|-------------|
-| **Lexer** | `/lexer-page` | Full token stream with type badges and line numbers |
-| **Parser** | `/parser-page` | Pass/fail status + all recursive-descent parse steps |
-| **Semantic** | `/semantic-page` | Errors (undefined variables) and warnings (redefined functions) |
-| **Symbol Table** | `/symbol-page` | Every identifier — name, kind, type, scope, value, memory address |
+| Phase            | Page             | What you see                                                      |
+| ---------------- | ---------------- | ----------------------------------------------------------------- |
+| **Lexer**        | `/lexer-page`    | Full token stream with type badges and line numbers               |
+| **Parser**       | `/parser-page`   | Pass/fail status + all recursive-descent parse steps              |
+| **Semantic**     | `/semantic-page` | Errors (undefined variables) and warnings (redefined functions)   |
+| **Symbol Table** | `/symbol-page`   | Every identifier — name, kind, type, scope, value, memory address |
 
 Use the **Home page** to run all 4 phases at once with tabbed results.
 
@@ -29,8 +29,8 @@ Use the **Home page** to run all 4 phases at once with tabbed results.
 
 ## Screenshots
 
-| Home — Run All | Symbol Table Page |
-|---|---|
+| Home — Run All     | Symbol Table Page  |
+| ------------------ | ------------------ |
 | _(add screenshot)_ | _(add screenshot)_ |
 
 ---
@@ -90,15 +90,16 @@ All endpoints accept `POST` with `Content-Type: application/json`.
 
 **Request body:** `{ "code": "<python source code>" }`
 
-| Endpoint | Returns |
-|----------|---------|
-| `POST /api/lexer` | `{ tokens, errors, log }` |
-| `POST /api/parser` | `{ success, errors, parse_steps }` |
-| `POST /api/semantic` | `{ success, errors, warnings, log }` |
-| `POST /api/symbol_table` | `{ entries, log, summary }` |
-| `POST /api/analyze_all` | All four results combined |
+| Endpoint                 | Returns                              |
+| ------------------------ | ------------------------------------ |
+| `POST /api/lexer`        | `{ tokens, errors, log }`            |
+| `POST /api/parser`       | `{ success, errors, parse_steps }`   |
+| `POST /api/semantic`     | `{ success, errors, warnings, log }` |
+| `POST /api/symbol_table` | `{ entries, log, summary }`          |
+| `POST /api/analyze_all`  | All four results combined            |
 
 **Example — call the lexer:**
+
 ```bash
 curl -X POST http://127.0.0.1:5000/api/lexer \
   -H "Content-Type: application/json" \
@@ -110,13 +111,16 @@ curl -X POST http://127.0.0.1:5000/api/lexer \
 ## Deploy to Vercel
 
 **Option 1 — Vercel CLI**
+
 ```bash
 npm install -g vercel
 vercel
 ```
+
 Follow the prompts. Your app goes live at a `*.vercel.app` URL.
 
 **Option 2 — GitHub Auto-Deploy**
+
 1. Push this repo to GitHub
 2. Go to [vercel.com](https://vercel.com) → New Project → Import your repo
 3. Vercel detects `vercel.json` automatically and deploys
@@ -127,31 +131,34 @@ Every future `git push` to `main` triggers a redeploy.
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Backend | Python 3, Flask |
+| Layer    | Technology                               |
+| -------- | ---------------------------------------- |
+| Backend  | Python 3, Flask                          |
 | Frontend | Vanilla JS, HTML5, CSS3 (glass-morphism) |
-| Fonts | Inter, JetBrains Mono |
-| Icons | Font Awesome 6 |
-| Hosting | Vercel |
+| Fonts    | Inter, JetBrains Mono                    |
+| Icons    | Font Awesome 6                           |
+| Hosting  | Vercel                                   |
 
 ---
 
 ## Compiler Phases — Technical Detail
 
 ### Lexer (`lexer/lexer.py`)
+
 - Regex-based tokenizer using Python `re` named groups
 - Token types: `KEYWORD`, `BUILTIN`, `IDENTIFIER`, `INTEGER`, `FLOAT`, `STRING`, `OPERATOR`, `OP_AUG`, `SEPARATOR`, `COMMENT`, `INDENT`, `DEDENT`, `NEWLINE`
 - Generates INDENT/DEDENT tokens by tracking indentation stack — this is what makes it a real Python lexer
 - Reports line numbers for every token and every error
 
 ### Parser (`parser/parser.py`)
+
 - Recursive-descent (top-down) parser
 - Handles: assignments, if/elif/else, for-in, while, def with parameters and return type annotation (`->`), class
 - Full expression hierarchy: `or → and → not → comparison → arithmetic → term → factor → power → atom`
 - Handles attribute access (`a.b`), subscript (`a[i]`), and function calls (`f(x, y)`) via `parse_atom_expr()`
 
 ### Semantic Analyzer (`semantic/semantic.py`)
+
 - Tracks three scopes: `global_vars`, `local_vars`, `functions`
 - Detects **use-before-assignment** for all identifiers
 - Detects **duplicate function definitions** (warning, not error — Python allows this)
@@ -159,6 +166,7 @@ Every future `git push` to `main` triggers a redeploy.
 - Does NOT flag Python built-ins (`print`, `range`, `len`, etc.)
 
 ### Symbol Table (`symbol_table/symbol_table.py`)
+
 - `SymbolTableEntry` stores: `name`, `kind`, `data_type`, `scope`, `value`, `address`
 - `kind` values: `variable`, `function`, `class`, `parameter`, `module`
 - Type inference from assigned literal: `int`, `float`, `str`, `bool`, `NoneType`, `unknown`
@@ -184,4 +192,4 @@ Paste this on the home page and click **Run All** to see all 4 phases at once.
 
 ---
 
-*Built with Python, Flask, and vanilla JS.*
+_Built with Python, Flask, and vanilla JS._
