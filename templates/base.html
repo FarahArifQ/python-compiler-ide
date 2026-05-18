@@ -393,6 +393,85 @@ textarea.code-ta::placeholder{color:var(--gray-300)}
 .ti-ok {color:var(--emerald)}
 .ti-err{color:var(--red)}
 @keyframes sup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ========================================================
+   HAMBURGER BUTTON (mobile only)
+   ======================================================== */
+.menu-btn{
+  display:none;
+  width:36px;height:36px;border-radius:var(--r-sm);
+  border:1px solid var(--border);background:white;
+  cursor:pointer;align-items:center;justify-content:center;
+  font-size:15px;color:var(--gray-600);flex-shrink:0;
+  transition:var(--ease);
+}
+.menu-btn:hover{background:var(--gray-50);color:var(--gray-800)}
+
+/* Sidebar overlay */
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(15,23,42,0.45);z-index:199;
+  backdrop-filter:blur(2px);
+}
+.sidebar-overlay.open{display:block}
+
+/* ========================================================
+   RESPONSIVE — MOBILE
+   ======================================================== */
+@media (max-width:768px){
+
+  /* Header */
+  .menu-btn{display:flex}
+  .h-divider,.h-sub{display:none}
+  .h-chip:not(.h-chip-status){display:none}
+  .header{padding:0 14px;gap:10px}
+  .logo-name{font-size:14px}
+
+  /* Sidebar becomes a full-height drawer */
+  .sidebar{
+    position:fixed;
+    top:0;left:0;
+    height:100vh;
+    z-index:200;
+    transform:translateX(-110%);
+    transition:transform 0.26s cubic-bezier(0.4,0,0.2,1);
+    box-shadow:var(--sh-lg);
+  }
+  .sidebar.open{transform:translateX(0)}
+
+  /* App: full width */
+  .app{display:block}
+  .main{width:100%;overflow-x:hidden}
+
+  /* Phase pages split → stack vertically */
+  .split{flex-direction:column !important;overflow:visible !important;height:auto !important}
+  .split-editor{
+    width:100% !important;flex-shrink:0;
+    height:260px;border-right:none !important;
+    border-bottom:1px solid #e2e8f0;
+  }
+  .split-results{
+    flex:none !important;height:auto;
+    min-height:300px;padding:16px !important;
+  }
+  .phase-page{height:auto !important;overflow:visible !important}
+
+  /* Tables — horizontal scroll */
+  .r-table th,.r-table td{padding:8px 10px;white-space:nowrap}
+  div:has(>.r-table){overflow-x:auto}
+
+  /* Buttons */
+  .btn-run{width:100%;justify-content:center}
+
+  /* Toast */
+  .toast{bottom:16px;right:12px;left:12px;max-width:none}
+
+  /* Phase banners */
+  .phase-banner{padding:14px 16px 12px;gap:12px}
+  .ph-icon{width:40px;height:40px;font-size:17px}
+  .ph-title{font-size:16px}
+  .ph-sub{font-size:11px}
+}
 </style>
 {% block extra_head %}{% endblock %}
 </head>
@@ -400,6 +479,9 @@ textarea.code-ta::placeholder{color:var(--gray-300)}
 
 <!-- HEADER -->
 <header class="header">
+  <button class="menu-btn" onclick="toggleSidebar()" aria-label="Menu">
+    <i class="fa fa-bars"></i>
+  </button>
   <a href="/" class="header-logo">
     <div class="logo-mark"><i class="fa fa-microchip"></i></div>
     <span class="logo-name">Python Compiler</span>
@@ -411,6 +493,7 @@ textarea.code-ta::placeholder{color:var(--gray-300)}
   <div class="h-chip h-chip-status" id="hdr-status">Ready</div>
 </header>
 
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 <div class="app">
   <!-- SIDEBAR -->
   <nav class="sidebar">
@@ -656,8 +739,8 @@ function saveFile() {
   const code = ed ? ed.value : (localStorage.getItem(CODE_KEY)||'');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([code],{type:'text/plain'}));
-  a.download = 'source.c'; a.click();
-  showToast('Saved as source.c', 'ok');
+  a.download = 'source.py'; a.click();
+  showToast('Saved as source.py', 'ok');
 }
 function clearEditor() {
   const ed = getEd();
@@ -691,6 +774,18 @@ function showToast(msg, type) {
   if (ic) ic.className = type==='err' ? 'fa fa-circle-xmark ti-err' : 'fa fa-circle-check ti-ok';
   clearTimeout(_tt); _tt = setTimeout(()=>t.classList.remove('show'), 3200);
 }
+
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+
+/* close sidebar when a nav link is tapped on mobile */
+document.addEventListener('click', e => {
+  const link = e.target.closest('.nav-item[href]');
+  if (link) document.querySelector('.sidebar').classList.remove('open'),
+            document.getElementById('sidebar-overlay').classList.remove('open');
+});
 
 function escH(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
