@@ -1,9 +1,6 @@
 """
 Python Lexical Analyzer
 =======================
-Air University — Compiler Construction Lab
-Instructor: Ms. Rubab Hafeez
-
 Tokenizes Python source code using regex patterns.
 Generates INDENT/DEDENT tokens for block structure (PEP 8).
 """

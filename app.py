@@ -1,9 +1,6 @@
 """
-Mini Compiler IDE - Flask Application
-======================================
-Air University, Compiler Construction Lab
-Instructor: Ms. Rubab Hafeez
-
+Python Compiler IDE - Flask Application
+========================================
 Entry point for the Flask web application.
 Provides REST API endpoints for each compiler phase.
 """
@@ -182,11 +179,8 @@ def api_analyze_all():
 
 
 if __name__ == '__main__':
-    print("=" * 55)
-    print("  Mini Compiler IDE — Air University")
-    print("  Compiler Construction Lab")
-    print("  Instructor: Ms. Rubab Hafeez")
-    print("=" * 55)
-    print("  Open http://127.0.0.1:5000 in your browser")
-    print("=" * 55)
+    print("=" * 45)
+    print("  Python Compiler IDE")
+    print("  http://127.0.0.1:5000")
+    print("=" * 45)
     app.run(debug=True, port=5000)

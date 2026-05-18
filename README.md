@@ -2,8 +2,6 @@
 
 A browser-based Python compiler that demonstrates all four classical compiler phases — Lexical Analysis, Syntax Analysis, Semantic Analysis, and Symbol Table — built with Flask and a modern glass-morphism UI.
 
-**Air University — Compiler Construction Lab**  
-**Instructor:** Ms. Rubab Hafeez  
 **Group Members:** Farah · Mahnoor · Zaynab
 
 ---
@@ -186,4 +184,4 @@ Paste this on the home page and click **Run All** to see all 4 phases at once.
 
 ---
 
-*Built for Compiler Construction Lab, Air University, Kamra Campus.*
+*Built with Python, Flask, and vanilla JS.*

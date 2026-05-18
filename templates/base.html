@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>{% block title %}Mini Compiler{% endblock %} — Air University</title>
+<title>{% block title %}Python Compiler{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
@@ -402,12 +402,11 @@ textarea.code-ta::placeholder{color:var(--gray-300)}
 <header class="header">
   <a href="/" class="header-logo">
     <div class="logo-mark"><i class="fa fa-microchip"></i></div>
-    <span class="logo-name">Mini Compiler IDE</span>
+    <span class="logo-name">Python Compiler</span>
   </a>
   <div class="h-divider"></div>
-  <span class="h-sub">Compiler Construction Lab &nbsp;·&nbsp; Air University, Kamra</span>
+  <span class="h-sub">Lexer &nbsp;·&nbsp; Parser &nbsp;·&nbsp; Semantic &nbsp;·&nbsp; Symbol Table</span>
   <div class="h-spacer"></div>
-  <div class="h-chip h-chip-default"><i class="fa fa-user-graduate"></i>&nbsp; Ms. Rubab Hafeez</div>
   <div class="h-chip" style="background:#f0fdf4;color:#059669;border:1px solid #bbf7d0"><i class="fa fa-users"></i>&nbsp; Farah &bull; Mahnoor &bull; Zaynab</div>
   <div class="h-chip h-chip-status" id="hdr-status">Ready</div>
 </header>
@@ -485,7 +484,7 @@ textarea.code-ta::placeholder{color:var(--gray-300)}
     </div>
 
     <div class="sb-footer">
-      Air University · Kamra Campus<br/>
+      Python Compiler IDE<br/>
       Python &nbsp;·&nbsp; Flask &nbsp;·&nbsp; Regex
     </div>
   </nav>
@@ -508,7 +507,7 @@ const SAMPLES = {
   hello:
 `# Hello World in Python
 print("Hello, World!")
-name = "Air University"
+name = "Python"
 print("Welcome to", name)`,
 
   variables:

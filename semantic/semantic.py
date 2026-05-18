@@ -1,9 +1,6 @@
 """
 Python Semantic Analyzer
 ========================
-Air University — Compiler Construction Lab
-Instructor: Ms. Rubab Hafeez
-
 Performs semantic checks on Python token stream:
   1. Use before assignment (undefined variable)
   2. Duplicate function definitions

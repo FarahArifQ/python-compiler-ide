@@ -1,9 +1,6 @@
 """
 Python Symbol Table Builder
 ============================
-Air University — Compiler Construction Lab
-Instructor: Ms. Rubab Hafeez
-
 Builds a symbol table from a Python token list.
 Tracks variables, functions, classes, and parameters
 with inferred types, scope, and simulated addresses.

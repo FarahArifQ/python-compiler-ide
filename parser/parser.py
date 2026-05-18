@@ -1,9 +1,6 @@
 """
 Python Syntax Analyzer (Parser)
 ================================
-Air University — Compiler Construction Lab
-Instructor: Ms. Rubab Hafeez
-
 Recursive-descent parser for a Python subset.
 Uses INDENT/DEDENT tokens from the lexer for block structure.
 
